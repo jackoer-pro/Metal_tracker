@@ -6,6 +6,7 @@ import os
 from dotenv import load_dotenv
 import plotly.express as px
 from scipy.stats import pearsonr
+import datetime
 
 # set the config
 st.set_page_config(
@@ -33,7 +34,7 @@ def load_historical_data():
 nickel_hist, iron_ore_hist = load_historical_data()
 
 # GET LIVE PRICE
-@st.cache_data(ttl=3600)  # refresh every hour
+@st.cache_data(ttl=60)  # refresh every hour
 def get_live_nickel():
     querystring = {"symbol":"NI","currency":"USD"}
     response=requests.get(
@@ -41,14 +42,23 @@ def get_live_nickel():
         headers=HEADERS,
         params=querystring
     )
-
-    data=response.json()['results'][0]
+    data = response.json()['results'][0]
+    
+    price_usd_lb = data["mid"]
+    price_usd_kg = price_usd_lb * 2.20462
+    price_vnd_kg = price_usd_kg * 26300
+    
+    # Calculate change % from our CSV, not API
+    history = pd.read_csv("data/nickel_clean.csv")
+    last_price = history["VND_per_kg"].iloc[-1]
+    change_pct = ((price_vnd_kg - last_price) / last_price * 100)
+    
     return {
-        "price_usd_lb" : data["mid"],
-        "price_usd_kg" : data["mid"] * 2.20462,
-        "price_vnd_kg" : data["mid"] * 2.20462 * 26300,
-        "change_pct"   : data["changePercentage"],
-        "timestamp"    : data["originalTime"]
+        "price_usd_lb" : price_usd_lb,
+        "price_usd_kg" : price_usd_kg,
+        "price_vnd_kg" : price_vnd_kg,
+        "change_pct"   : change_pct,
+        "timestamp"    : datetime.date.today().isoformat()  # use today's date, not API
     }
 
 # ── PAGE NAVIGATION ────────────────────────────────────────
