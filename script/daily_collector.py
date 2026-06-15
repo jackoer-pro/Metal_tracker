@@ -5,6 +5,7 @@ import datetime
 import os
 import subprocess
 from dotenv import load_dotenv
+import traceback
 
 # ── CONFIG ──────────────────────────────────────────────────
 load_dotenv()
@@ -15,7 +16,7 @@ HEADERS = {
     "x-rapidapi-host": "metal-sentinel.p.rapidapi.com"
 }
 
-CSV_PATH = r"C:\Users\Trach\OneDrive\Desktop\python journey\Project_5\data\nickel_clean.csv"
+CSV_PATH = r"C:\Users\Trach\OneDrive\Desktop\python_journey\project_5\data\nickel_clean.csv"
 
 # ── FETCH LIVE PRICE ────────────────────────────────────────
 def get_live_nickel():
@@ -78,9 +79,9 @@ try:
     print(f"  Price: {today_data['VND_per_kg']:,.0f} VND/kg")
     print(f"  Change: {change_pct:+.2f}%")
     # commit to git hub
-    REPO_PATH = r"C:\Users\Trach\OneDrive\Desktop\python journey\project_5"
+    REPO_PATH = r"C:\Users\Trach\OneDrive\Desktop\python_journey\project_5"
     os.chdir(REPO_PATH)
-    subprocess.run(["git", "add", "data/nickel_daily.csv"], check=True)
+    subprocess.run(["git", "add", "data/nickel_clean.csv"], check=True)
     subprocess.run([
         "git", "commit", "-m", 
         f"Auto-update: {today_data['Date']} — ${today_data['USD_per_kg']:.2f}/kg"
@@ -88,5 +89,5 @@ try:
     subprocess.run(["git", "push"], check=True)
     
     print(f"✓ Pushed to GitHub")
-except Exception as e:
-    print(f"✗ Error: {e}")
+except Exception:
+    traceback.print_exc()
