@@ -75,7 +75,7 @@ try:
     history.to_csv(CSV_PATH, index=False)
     
     change_pct = new_row["Change %"].iloc[0]
-    print(f"✓ Saved {today_data['Date']}")
+    print(f" Saved {today_data['Date']}")
     print(f"  Price: {today_data['VND_per_kg']:,.0f} VND/kg")
     print(f"  Change: {change_pct:+.2f}%")
     # commit to git hub
@@ -88,6 +88,7 @@ try:
     ], check=True)
     subprocess.run(["git", "push"], check=True)
     
-    print(f"✓ Pushed to GitHub")
+    print(f" Pushed to GitHub")
 except Exception:
     traceback.print_exc()
+    
